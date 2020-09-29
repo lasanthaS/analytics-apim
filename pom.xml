@@ -1234,6 +1234,7 @@
         <module>clients</module>
         <module>components</module>
         <module>features</module>
+        <module>modules/integration</module>
         <module>product/distribution</module>
     </modules>
 </project>
