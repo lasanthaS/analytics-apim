@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.analytics.apim.idp.client.dao.OAuthAppDAO;
 import org.wso2.analytics.apim.idp.client.token.TokenDataMapCleaner;
+import org.wso2.analytics.apim.idp.client.util.SSLConfiguration;
 import org.wso2.carbon.analytics.idp.client.core.api.AnalyticsHttpClientBuilderService;
 import org.wso2.carbon.analytics.idp.client.core.api.IdPClient;
 import org.wso2.carbon.analytics.idp.client.core.exception.IdPClientException;
@@ -60,6 +61,9 @@ public class ApimIdPClientFactory implements IdPClientFactory {
     private static final String CUSTOM_URL_API_ENDPOINT = "/api/am/admin/v1/custom-urls";
     private TokenDataMapCleaner tokenDataMapCleaner;
 
+    private String keyStorePassword;
+    private String trustStorePassword;
+
     @Activate
     protected void activate(BundleContext bundleContext) {
         LOG.debug("APIM IDP client factory activated.");
@@ -67,6 +71,9 @@ public class ApimIdPClientFactory implements IdPClientFactory {
         // Start tokenData map cleaner.
         this.tokenDataMapCleaner = new TokenDataMapCleaner();
         this.tokenDataMapCleaner.startTokenDataMapCleaner();
+
+        System.setProperty("javax.net.ssl.keyStorePassword", this.keyStorePassword);
+        System.setProperty("javax.net.ssl.trustStorePassword", this.trustStorePassword);
     }
 
     @Deactivate
@@ -129,9 +136,14 @@ public class ApimIdPClientFactory implements IdPClientFactory {
     )
     protected void registerConfigProvider(ConfigProvider configProvider) {
         CarbonConfiguration carbonConfiguration;
+        SSLConfiguration sslConfiguration;
         try {
             carbonConfiguration = configProvider.getConfigurationObject(CarbonConfiguration.class);
             this.isHostnameVerifierEnabled = carbonConfiguration.isHostnameVerificationEnabled();
+
+            sslConfiguration = configProvider.getConfigurationObject(SSLConfiguration.class);
+            this.keyStorePassword = sslConfiguration.getKeyStorePassword();
+            this.trustStorePassword = sslConfiguration.getTrustStorePassword();
         } catch (ConfigurationException e) {
             LOG.error("Error occurred while initializing ApimIdPClientFactory: " + e.getMessage(), e);
         }
