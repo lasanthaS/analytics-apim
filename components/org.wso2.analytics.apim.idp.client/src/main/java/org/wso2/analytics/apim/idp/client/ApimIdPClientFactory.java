@@ -42,6 +42,7 @@ import org.wso2.carbon.config.ConfigurationException;
 import org.wso2.carbon.config.provider.ConfigProvider;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
+import org.wso2.carbon.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class ApimIdPClientFactory implements IdPClientFactory {
     private static final String CUSTOM_URL_API_ENDPOINT = "/api/am/admin/v1/custom-urls";
     private TokenDataMapCleaner tokenDataMapCleaner;
 
+    private boolean isSSLConfigsExistInConfigProvider = false;
     private String keyStorePassword;
     private String trustStorePassword;
     private String keyStoreLocation;
@@ -74,10 +76,18 @@ public class ApimIdPClientFactory implements IdPClientFactory {
         this.tokenDataMapCleaner = new TokenDataMapCleaner();
         this.tokenDataMapCleaner.startTokenDataMapCleaner();
 
-        System.setProperty("javax.net.ssl.keyStorePassword", this.keyStorePassword);
-        System.setProperty("javax.net.ssl.trustStorePassword", this.trustStorePassword);
-        System.setProperty("javax.net.ssl.keyStore", this.keyStoreLocation);
-        System.setProperty("javax.net.ssl.trustStore", this.trustStoreLocation);
+        // In case keystore/trustore configs are defined in deployment.yaml, override the jvm parameter values set
+        // through the carbon.sh files
+        if (isSSLConfigsExistInConfigProvider) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Overriding keystore and truststore configurations in carbon.sh with configuration values "
+                                + "included in deployment.yaml");
+            }
+            System.setProperty("javax.net.ssl.keyStorePassword", this.keyStorePassword);
+            System.setProperty("javax.net.ssl.trustStorePassword", this.trustStorePassword);
+            System.setProperty("javax.net.ssl.keyStore", this.keyStoreLocation);
+            System.setProperty("javax.net.ssl.trustStore", this.trustStoreLocation);
+        }
     }
 
     @Deactivate
@@ -150,6 +160,11 @@ public class ApimIdPClientFactory implements IdPClientFactory {
             this.trustStorePassword = sslConfiguration.getTrustStorePassword();
             this.keyStoreLocation = sslConfiguration.getKeyStoreLocation();
             this.trustStoreLocation = sslConfiguration.getTrustStoreLocation();
+            if (!StringUtils.isNullOrEmptyAfterTrim(keyStorePassword) && !StringUtils
+                    .isNullOrEmptyAfterTrim(keyStoreLocation) && !StringUtils.isNullOrEmptyAfterTrim(trustStorePassword)
+                    && !StringUtils.isNullOrEmptyAfterTrim(trustStoreLocation)) {
+                isSSLConfigsExistInConfigProvider = true;
+            }
         } catch (ConfigurationException e) {
             LOG.error("Error occurred while initializing ApimIdPClientFactory: " + e.getMessage(), e);
         }

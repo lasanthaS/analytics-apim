@@ -27,13 +27,13 @@ import org.wso2.carbon.config.annotation.Element;
 public class SSLConfiguration {
 
     @Element(description = "Keystore Password", required = true)
-    private String keyStorePassword = "wso2carbon";
+    private String keyStorePassword = null;
 
     @Element(description = "Keystore Location", required = true)
     private String keyStoreLocation = null;
 
     @Element(description = "Truststore Password")
-    private String trustStorePassword = "wso2carbon";
+    private String trustStorePassword = null;
 
     @Element(description = "Truststore Location")
     private String trustStoreLocation = null;
