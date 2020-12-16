@@ -63,6 +63,8 @@ public class ApimIdPClientFactory implements IdPClientFactory {
 
     private String keyStorePassword;
     private String trustStorePassword;
+    private String keyStoreLocation;
+    private String trustStoreLocation;
 
     @Activate
     protected void activate(BundleContext bundleContext) {
@@ -74,6 +76,8 @@ public class ApimIdPClientFactory implements IdPClientFactory {
 
         System.setProperty("javax.net.ssl.keyStorePassword", this.keyStorePassword);
         System.setProperty("javax.net.ssl.trustStorePassword", this.trustStorePassword);
+        System.setProperty("javax.net.ssl.keyStore", this.keyStoreLocation);
+        System.setProperty("javax.net.ssl.trustStore", this.trustStoreLocation);
     }
 
     @Deactivate
@@ -144,6 +148,8 @@ public class ApimIdPClientFactory implements IdPClientFactory {
             sslConfiguration = configProvider.getConfigurationObject(SSLConfiguration.class);
             this.keyStorePassword = sslConfiguration.getKeyStorePassword();
             this.trustStorePassword = sslConfiguration.getTrustStorePassword();
+            this.keyStoreLocation = sslConfiguration.getKeyStoreLocation();
+            this.trustStoreLocation = sslConfiguration.getTrustStoreLocation();
         } catch (ConfigurationException e) {
             LOG.error("Error occurred while initializing ApimIdPClientFactory: " + e.getMessage(), e);
         }

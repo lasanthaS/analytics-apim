@@ -29,8 +29,14 @@ public class SSLConfiguration {
     @Element(description = "Keystore Password", required = true)
     private String keyStorePassword = "wso2carbon";
 
-    @Element(description = "TruststorePassword")
+    @Element(description = "Keystore Location", required = true)
+    private String keyStoreLocation = null;
+
+    @Element(description = "Truststore Password")
     private String trustStorePassword = "wso2carbon";
+
+    @Element(description = "Truststore Location")
+    private String trustStoreLocation = null;
 
     public String getKeyStorePassword() {
         return keyStorePassword;
@@ -40,4 +46,11 @@ public class SSLConfiguration {
         return trustStorePassword;
     }
 
+    public String getTrustStoreLocation() {
+        return trustStoreLocation;
+    }
+
+    public String getKeyStoreLocation() {
+        return keyStoreLocation;
+    }
 }
