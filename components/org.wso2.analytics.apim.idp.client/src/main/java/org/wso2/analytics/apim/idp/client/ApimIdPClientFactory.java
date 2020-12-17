@@ -160,8 +160,9 @@ public class ApimIdPClientFactory implements IdPClientFactory {
             this.trustStorePassword = sslConfiguration.getTrustStorePassword();
             this.keyStoreLocation = sslConfiguration.getKeyStoreLocation();
             this.trustStoreLocation = sslConfiguration.getTrustStoreLocation();
-            if (!StringUtils.isNullOrEmptyAfterTrim(keyStorePassword) && !StringUtils
-                    .isNullOrEmptyAfterTrim(keyStoreLocation) && !StringUtils.isNullOrEmptyAfterTrim(trustStorePassword)
+            if (!StringUtils.isNullOrEmptyAfterTrim(keyStorePassword)
+                    && !StringUtils.isNullOrEmptyAfterTrim(keyStoreLocation)
+                    && !StringUtils.isNullOrEmptyAfterTrim(trustStorePassword)
                     && !StringUtils.isNullOrEmptyAfterTrim(trustStoreLocation)) {
                 isSSLConfigsExistInConfigProvider = true;
             }
